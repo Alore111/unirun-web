@@ -305,8 +305,8 @@ function genTrackPoints(distance, mapId = 'default', durationMinutes) {
   const durationMs = Math.round((targetDistance / 1000) * pace * 60 * 1000);
   const baseSpeed = 1000 / (pace * 60);
   const baseSpacing = clamp(targetDistance / 1200, 4, 8);
-  const jitter = 0.000003;
-  const bboxPad = 0.00005;
+  const jitter = 0.000001;
+  const bboxPad = 0.00001;
 
   const addJitter = ([lng, lat]) => [
     clamp(lng + (Math.random() - 0.5) * 2 * jitter, bounds.minLng - bboxPad, bounds.maxLng + bboxPad),

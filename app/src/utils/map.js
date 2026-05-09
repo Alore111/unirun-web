@@ -144,8 +144,8 @@ export function genTrackPoints(distance, mapChoice = 'default', durationMinutes)
   const baseSpeed = 1000 / (pace * 60);
   const baseSpacing = clampValue(targetDistance / 1200, 4, 8);
   const maxTotalPoints = 4000;
-  const jitter = 0.000003;
-  const bboxPad = 0.00005;
+  const jitter = 0.000001;
+  const bboxPad = 0.00001;
 
   const addJitter = ([lng, lat]) => [
     clampValue(
