@@ -4,7 +4,7 @@ import { AppApiClient } from './client';
 const vBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
 export const appConfig = {
-  appVersion: '1.8.3',
+  appVersion: '1.8.5',
   api: {
     baseUrl: vBaseUrl || '/devproxy',
   },

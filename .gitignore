@@ -29,3 +29,9 @@ dist-ssr
 .history/
 
 __pycache__/
+
+# APK files
+*.apk
+
+# Runtime data
+autorun-local/tasks.json

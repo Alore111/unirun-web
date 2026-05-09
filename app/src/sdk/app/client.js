@@ -245,6 +245,7 @@ export class AppApiClient {
       vocalStatus: '1',
       yearSemester,
       recordDate,
+      realityTrackPoints: trackPoints,
     });
   }
 
