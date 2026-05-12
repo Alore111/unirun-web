@@ -1,98 +1,123 @@
-# UNIRUN校园跑助手网页版
+<p align="center">
+  <a href="https://byerun.pages.dev" target="_blank" rel="noopener noreferrer">
+    <img width="160" height="160" src="./app/public/favicon.ico" alt="Byerun">
+  </a>
+</p>
 
-UNIRUN校园跑助手网页版，自动规划跑步路径，生成跑步记录。
+<h1 align="center"/>Byerun <sup><em>web</em></sup></h1>
 
-| 地图支持                    |
-| --------------------------- |
-| 成都信息工程大学（航空港校区） |
-| 成都信息工程大学（龙泉校区） |
-| 成都中医药大学（温江校区） |
-| ...                         |
+<p align="center">
+Goodbye Unirun - 校园跑助手🏃‍♂️
+</p>
+<p align="center">
+<i>身体是革命的本钱 别让打卡磨灭了你对运动的热情</i>
+</p>
+
+<p align="center">
+<i>一键完成记录 / 云端定时任务 / 在线反馈社区 / 校友圈 </i>
+</p>
+
+## 支持的地图
+
+| 学校名称                                          |
+| ------------------------------------------------- |
+| [成都信息工程大学](https://cuit.edu.cn/)          |
+| [成都中医药大学](https://cdutcm.edu.cn/)          |
+| [四川邮电职业技术学院](https://www.sptc.edu.cn/)  |
+| [四川工商职业技术学院](https://www.sctbc.net/)    |
+| [四川南充卫生学校](http://www.ncwsxx.com/)        |
+| [广安职业技术学院](https://www.gavtc.edu.cn/)     |
+| [川北幼儿师范](https://cbyz.edu.cn/)              |
+| [唐山工业职业技术大学](https://www.tsgzy.edu.cn/) |
+| [...](...)                                        |
+
+<i>需要更多地图欢迎反馈添加<i>
 
 ## 使用
 
-- [Cloudflare](https://unirun.pages.dev)
+| 部署平台   |                                     |                                     |
+| ---------- | ----------------------------------- | ----------------------------------- |
+| Cloudflare | [Byerun](https://byerun.pages.dev)  | [Unirun](https://unirun.pages.dev)  |
+| Vercel     | [Byerun](https://byerun.vercel.app) | [Unirun](https://unirun.vercel.app) |
 
-- [Vercel](https://unirun.vercel.app)
+## 本地构建
 
-<img src="./file/login.png" width="200"> <img src="./file/dashboard.jpg" width="200"> <img src="./file/clubinfo.jpg" width="200"> <img src="./file/clubstatus.jpg" width="200">
+进入项目文件夹:
 
-## 运行
+```bash
+cd app
+```
 
-安装依赖：
+安装依赖:
 
 ```bash
 npm install
 ```
 
-运行调试：
+开发调试:
 
 ```bash
-npm run serve
+npm run dev
 ```
 
-打包：
+构建:
 
 ```bash
 npm run build
 ```
 
-## 主要API
+## 代理
 
-| Name |Url |
-| -------- | -------- |
-| baseURL | https://run-lb.tanmasports.com/v1 |
-| 登录 | `${baseURL}/auth/login/password` |
-| 用户信息 | `${baseURL}/auth/query/token` |
-| 完成率信息 | `${baseURL}/clubactivity/getJoinNum` |
-| 标准信息 | `${baseURL}/unirun/query/runStandard` |
-| 新纪录 | `${baseURL}/unirun/save/run/record/new` |
-| 俱乐部信息 | `${baseURL}/clubactivity/querySemesterClubActivity` |
-| 俱乐部参与记录 | `${baseURL}/clubactivity/queryMyActivityList` |
-| 待签到俱乐部 | `${baseURL}/clubactivity/queryMySemesterClubActivity` |
-| 俱乐部加入退出状态 | `${baseURL}/clubactivity/joinOrCancelSchoolSemesterActivity` |
+进入代理文件夹:
 
-> Workerjs
-
-```
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request))
-})
-
-async function handleRequest(request) {
-  const url = new URL(request.url)
-  const backendUrl = 'https://run-lb.tanmasports.com/v1' + url.pathname + url.search
-
-  // 克隆请求的头部
-  const newHeaders = new Headers(request.headers)
-
-  // 删除可能影响签名的头部
-  newHeaders.delete('Host')
-
-  const init = {
-    method: request.method,
-    headers: newHeaders,
-    // 获取并克隆请求体，以确保传递原始的内容
-    body: request.method === 'GET' ? null : await request.clone().text()
-  }
-
-  const response = await fetch(backendUrl, init)
-
-  const responseHeaders = new Headers(response.headers)
-  responseHeaders.set('Access-Control-Allow-Origin', '*')
-  responseHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-  responseHeaders.set('Access-Control-Allow-Headers', '*')
-
-  const body = await response.text()
-  return new Response(body, {
-    status: response.status,
-    headers: responseHeaders
-  })
-}
+```bash
+cd server
 ```
 
-# 免责声明
+安装依赖:
 
-使用本工具所产生的任何后果，用户需自行承担。
+```bash
+npm install
+```
 
-本工具仅供学习交流使用，不得用于任何商业用途。
+启动代理:
+
+```bash
+npm run start
+```
+
+**支持在 Cloudflare 和 Vercel 上部署代理，避免源服务器的跨域限制。**
+
+```mermaid
+graph TD;
+
+    classDef process fill:#E5F6FF,stroke:#73A6FF,stroke-width:2px;
+
+    classDef error fill:#FFEBEB,stroke:#E68994,stroke-width:2px;
+
+
+
+    A([ByerunWeb]):::process -->|Direct Request| U([UnirunAPI]):::process
+
+    U --> |Cross - Origin Restriction| E([Request Failed]):::error
+
+    A -->|Request Forwarded | C([Cloudflare / Vercel]):::process
+
+    C --> U
+
+    U --> C
+
+    C --> |Response Returned| A
+```
+
+## 声明
+
+本项目仅供学习研究使用，不得用于任何商业或非法用途。如需体验完整功能，请使用官方应用。
+
+## 致谢
+
+[@msojocs/AutoRun](https://github.com/msojocs/AutoRun)
+
+## 许可
+
+Byerun 基于 [CC BY-NC License, Version 4.0](https://creativecommons.org/licenses/by-nc/4.0/) 发布。
