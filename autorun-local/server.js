@@ -21,7 +21,7 @@ const { createUnirunProxyRouter } = require('./unirun-proxy');
 //  1. 应用初始化
 // ──────────────────────────────────────────────
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 
 function asyncHandler(fn) {
   return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
