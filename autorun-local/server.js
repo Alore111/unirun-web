@@ -15,12 +15,17 @@ const cron = require('node-cron');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { createUnirunProxyRouter } = require('./unirun-proxy');
 
 // ──────────────────────────────────────────────
 //  1. 应用初始化
 // ──────────────────────────────────────────────
 const app = express();
 app.use(express.json());
+
+function asyncHandler(fn) {
+  return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
+}
 
 // CORS
 app.use((req, res, next) => {
@@ -47,6 +52,8 @@ const CONFIG = {
   // 地图文件目录（从项目 app/src/assets/maps 复制过来）
   mapsDir: path.join(__dirname, 'maps'),
 };
+
+app.use(createUnirunProxyRouter(CONFIG));
 
 // ──────────────────────────────────────────────
 //  3. 数据持久化（JSON 文件）
@@ -105,34 +112,45 @@ function genSign({ appKey, appSecret, query = null, body = null }) {
 
   if (query !== null) {
     const normalizedQuery = Object.entries(query).reduce((acc, [k, v]) => {
-      acc[k] = v === null ? '' : String(v);
+      acc[k] = v == null ? '' : String(v);
       return acc;
     }, {});
+
     const sortedKeys = Object.keys(normalizedQuery).sort();
+
     for (const key of sortedKeys) {
       const value = normalizedQuery[key];
-      if (value !== '') signStr += key + value;
+      if (value === undefined || value === null) continue;
+      signStr += key + value;
     }
   }
 
   signStr += appKey;
   signStr += appSecret;
 
-  if (body !== null) signStr += JSON.stringify(body);
-
-  let replaced = false;
-  const specialChars = [' ', '~', '!', '(', ')', "'"];
-  for (const ch of specialChars) {
-    if (signStr.includes(ch)) {
-      signStr = signStr.replace(new RegExp(ch, 'g'), '');
-      replaced = true;
-    }
+  if (body !== null) {
+    signStr += typeof body === 'string'
+      ? body
+      : JSON.stringify(body);
   }
-  if (replaced) signStr = encodeURIComponent(signStr);
 
-  let sign = crypto.createHash('md5').update(signStr).digest('hex').toUpperCase();
-  if (replaced) sign += 'encodeutf8';
-  return sign;
+  signStr = signStr
+    .replace(/ /g, '')
+    .replace(/~/g, '')
+    .replace(/!/g, '')
+    .replace(/\(/g, '')
+    .replace(/\)/g, '')
+    .replace(/'/g, '');
+
+  signStr = encodeURIComponent(signStr);
+
+  const hex = crypto
+    .createHash('md5')
+    .update(signStr, 'utf8')
+    .digest('hex')
+    .toUpperCase();
+
+  return `${hex}encodeutf8`;
 }
 
 // MD5 密码哈希
@@ -144,7 +162,6 @@ function md5(str) {
 //  5. Unirun API 调用封装
 // ──────────────────────────────────────────────
 async function unirunRequest({ path: apiPath, method = 'GET', token = '', query = null, body = null }) {
-  const nodeFetch = (await import('node-fetch')).default;
 
   const sign = genSign({
     appKey: CONFIG.appKey,
@@ -154,8 +171,10 @@ async function unirunRequest({ path: apiPath, method = 'GET', token = '', query 
   });
 
   const headers = {
-    'Content-Type': 'application/json',
-    'appKey': CONFIG.appKey,
+    'Accept-Encoding': 'gzip',
+    'User-Agent': 'okhttp/4.12.0',
+    'Content-Type': 'application/json; charset=UTF-8',
+    'appkey': CONFIG.appKey,
     'sign': sign,
   };
   if (token) headers['token'] = token;
@@ -173,7 +192,7 @@ async function unirunRequest({ path: apiPath, method = 'GET', token = '', query 
     init.body = JSON.stringify(body);
   }
 
-  const resp = await nodeFetch(url, init);
+  const resp = await fetch(url, init);
   const data = await resp.json();
   return data;
 }
@@ -182,7 +201,7 @@ async function unirunRequest({ path: apiPath, method = 'GET', token = '', query 
 async function loginAndGetToken(userPhone, password) {
   const body = {
     appVersion: CONFIG.appVersion,
-    password: md5(password),
+    password: password,
     userPhone,
     brand: 'Apple',
     deviceToken: '',
@@ -190,10 +209,19 @@ async function loginAndGetToken(userPhone, password) {
     mobileType: 'iPhone',
     sysVersion: '18.6',
   };
-  const data = await unirunRequest({ path: '/auth/login/password', method: 'POST', body });
-  if (data?.code === 10000 && data?.response?.token) {
-    return data.response.token;
+
+  const data = await unirunRequest({
+    path: '/auth/login/password',
+    method: 'POST',
+    body,
+  });
+
+  const token = data?.response?.oauthToken?.token;
+
+  if (data?.code === 10000 && token) {
+    return token;
   }
+
   throw new Error(data?.msg || '登录失败');
 }
 
@@ -556,6 +584,12 @@ app.post('/api/status', (req, res) => {
     success: true,
     data: { executed: task.executed || false, last_run_at: task.last_run_at || null },
   });
+});
+
+app.use((err, req, res, next) => {
+  console.error(`[http] ${req.method} ${req.originalUrl} ❌ ${err?.message || err}`);
+  if (res.headersSent) return next(err);
+  res.status(500).json({ success: false, message: err?.message || 'Server Error' });
 });
 
 // ──────────────────────────────────────────────

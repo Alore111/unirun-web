@@ -2,11 +2,12 @@ import { clearAuthSessionStorage, getSessionToken } from './session';
 import { AppApiClient } from './client';
 
 const vBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+const fallbackBaseUrl = import.meta.env.DEV ? '/autorunserver' : '';
 
 export const appConfig = {
   appVersion: '1.8.5',
   api: {
-    baseUrl: vBaseUrl || '/devproxy',
+    baseUrl: vBaseUrl || fallbackBaseUrl,
   },
   auth: {
     appKey: import.meta.env.VITE_APP_KEY || '389885588s0648fa',
