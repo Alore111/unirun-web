@@ -1,10 +1,16 @@
+<div style="border: 1px solid #0969da; background: #ddf4ff; padding: 12px 16px; border-radius: 8px; margin: 16px 0;">
+  <strong>关于本仓库</strong><br/>
+  本项目为原项目Byerun（线上站点：<a href="https://unirun.pages.dev/" target="_blank" rel="noopener noreferrer">unirun.pages.dev</a>、<a href="https://unirun.vercel.app/" target="_blank" rel="noopener noreferrer">unirun.vercel.app</a>、<a href="https://unorun.cn/" target="_blank" rel="noopener noreferrer">unorun.cn</a>；源码仓库：<a href="https://github.com/yanyaoli/byerun-web" target="_blank" rel="noopener noreferrer">yanyaoli/byerun-web</a>）的 Fork。<br/>
+  已在与原作者沟通并获得授权后，于 <a href="https://unorun.can6.top/" target="_blank" rel="noopener noreferrer">unorun.can6.top</a> 继续运营与维护。
+</div>
+
 <p align="center">
   <a href="https://byerun.pages.dev" target="_blank" rel="noopener noreferrer">
     <img width="160" height="160" src="./app/public/favicon.ico" alt="Byerun">
   </a>
 </p>
 
-<h1 align="center"/>Byerun <sup><em>web</em></sup></h1>
+<h1 align="center">Byerun <sup><em>web</em></sup></h1>
 
 <p align="center">
 Goodbye Unirun - 校园跑助手🏃‍♂️
@@ -31,14 +37,11 @@ Goodbye Unirun - 校园跑助手🏃‍♂️
 | [唐山工业职业技术大学](https://www.tsgzy.edu.cn/) |
 | [...](...)                                        |
 
-<i>需要更多地图欢迎反馈添加<i>
+<i>需要更多地图欢迎反馈添加</i>
 
 ## 使用
 
-| 部署平台   |                                     |                                     |
-| ---------- | ----------------------------------- | ----------------------------------- |
-| Cloudflare | [Byerun](https://byerun.pages.dev)  | [Unirun](https://unirun.pages.dev)  |
-| Vercel     | [Byerun](https://byerun.vercel.app) | [Unirun](https://unirun.vercel.app) |
+访问线上网址： https://unorun.can6.top/
 
 ## 本地构建
 

@@ -16,7 +16,7 @@ export const appConfig = {
 };
 
 export const urls = {
-  github: 'https://github.com/yanyaoli/byerun-web',
+  github: 'https://github.com/Alore111/byerun-web',
 };
 
 function handleAuthFailure() {

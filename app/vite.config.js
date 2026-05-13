@@ -66,7 +66,7 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/devproxy/, ''),
         },
         '/autorunserver': {
-          target: env.VITE_AUTORUN_SERVER_BASE,
+          target: 'http://localhost:5891',
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/autorunserver/, ''),
